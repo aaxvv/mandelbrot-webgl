@@ -16,6 +16,4 @@ export class FractalViewerState {
             uViewMat: this.viewMatrix,
         };
     }
-
-
 }

@@ -72,7 +72,7 @@ const UNIFORMS: {[K in keyof(MandelbrotUniforms)]: UniformType} = {
     uViewMat: UniformType.MAT_3,
 };
 
-export function createMandelbrotShader(gl: WebGLRenderingContext): ShaderProgram {
+export function createMandelbrotShader(gl: WebGL2RenderingContext): ShaderProgram {
     console.debug("Creating shader program");
     return new ShaderProgram(gl, VERTEX_SHADER, FRAGMENT_SHADER, UNIFORMS);
 }

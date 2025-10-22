@@ -16,13 +16,13 @@ export enum UniformType {
 
 export class ShaderCanvasContext {
     canvas: HTMLCanvasElement;
-    gl: WebGLRenderingContext;
+    gl: WebGL2RenderingContext;
     shaderProgram: ShaderProgram | null;
     positionBuffer: WebGLBuffer;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        const gl = canvas.getContext("webgl");
+        const gl = canvas.getContext("webgl2");
         if (gl == null) {
             throw new Error("Failed to initialize context");
         }
@@ -77,7 +77,7 @@ export class ShaderCanvasContext {
 }
 
 export class ShaderProgram {
-    gl: WebGLRenderingContext;
+    gl: WebGL2RenderingContext;
 
     vertexShader: WebGLShader;
     fragmentShader: WebGLShader;
@@ -86,7 +86,7 @@ export class ShaderProgram {
     attributeLocations: {[name: string]: GLuint};
     uniformLocations: {[name: string]: {loc: WebGLUniformLocation, type: UniformType}};
 
-    constructor(gl: WebGLRenderingContext, vsSource: string, fsSource: string, uniforms: {[name: string]: UniformType}) {
+    constructor(gl: WebGL2RenderingContext, vsSource: string, fsSource: string, uniforms: {[name: string]: UniformType}) {
         this.gl = gl;
         this.vertexShader = compileShader(gl, "vertex", vsSource);
         this.fragmentShader = compileShader(gl, "fragment", fsSource);
