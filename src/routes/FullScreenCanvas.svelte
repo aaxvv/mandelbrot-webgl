@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { createMandelbrotShader, type MandelbrotUniforms } from "$lib/mandelbrot-shader";
+	import { Mat3, Vec2 } from "$lib/math";
 	import { ShaderCanvasContext } from "$lib/shader-canvas-context";
+	import { FractalViewerState } from "$lib/viewer-state.svelte";
     
     let canvas = $state<HTMLCanvasElement | null>(null);
     let context = $state<ShaderCanvasContext | null>(null);
-    let uniforms = $state<MandelbrotUniforms>({
-        uScreenSize: [1, 1],
-        uIterations: 1000,
-        uCenter: [0, 0],
-        uZoom: 1
-    });
+    let viewerState = $state<FractalViewerState>(new FractalViewerState());
     
     // create rendering context on canvas mount
     $effect(() => {
@@ -32,6 +29,7 @@
     // re-render on canvas resize
     $effect(() => {
         if (context != null) {
+            const uniforms = viewerState.createUniforms();
             context.updateUniforms(uniforms);
             context.render();
         }
@@ -42,24 +40,33 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        uniforms.uScreenSize = [window.innerWidth, window.innerHeight];
+        viewerState.screenSize = new Vec2(window.innerWidth, window.innerHeight);
     }
 
     function onScroll(evt: WheelEvent) {
-        // TODO: zoom into actual pointer position
+        const aspect = viewerState.screenSize.y / viewerState.screenSize.x;
+        const screenPos = new Vec2(evt.clientX, evt.clientY).div(viewerState.screenSize.scale(0.5)).sub(new Vec2(1, 1)).div(new Vec2(aspect, -1));
 
+        const worldPosBefore = viewerState.viewMatrix.mulVec(screenPos);
+        
         if (evt.deltaY > 0) {
-            uniforms.uZoom *= 1.1;
+            viewerState.zoom *= 1.1;
         } else {
-            uniforms.uZoom *= 0.9;
+            viewerState.zoom *= 0.9;
         }
+        
+        const futureViewMatrix = Mat3.makeTransformation(viewerState.center, viewerState.zoom);
+        const worldPosAfter = futureViewMatrix.mulVec(screenPos);
+        const offset = worldPosAfter.sub(worldPosBefore);
+        
+        viewerState.center = viewerState.center.sub(offset);
     }
 
     function onDrag(evt: MouseEvent) {
         if ((evt.buttons & 1) > 0) {
-            const scale = Math.min(uniforms.uScreenSize[0], uniforms.uScreenSize[1]) * 0.5;
-            uniforms.uCenter[0] -= evt.movementX / scale;
-            uniforms.uCenter[1] += evt.movementY / scale;
+            const scale = viewerState.screenSize.y * 0.5 * (1/viewerState.zoom);
+            const offset = new Vec2(-evt.movementX, evt.movementY).scale(1/scale);
+            viewerState.center = viewerState.center.add(offset);
         }
     }
 </script>

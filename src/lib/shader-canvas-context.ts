@@ -132,22 +132,22 @@ export class ShaderProgram {
                     this.gl.uniform1i(uniform.loc, value);
                     break;
                 case UniformType.VEC_2:
-                    this.gl.uniform2fv(uniform.loc, value);
+                    this.gl.uniform2f(uniform.loc, value.x, value.y);
                     break;
                 case UniformType.VEC_3:
-                    this.gl.uniform3fv(uniform.loc, value);
+                    this.gl.uniform3f(uniform.loc, value.x, value.y, value.z);
                     break;
                 case UniformType.VEC_4:
-                    this.gl.uniform4fv(uniform.loc, value);
+                    this.gl.uniform4f(uniform.loc, value.x, value.y, value.z, value.w);
                     break;
                 case UniformType.MAT_2:
-                    this.gl.uniformMatrix2fv(uniform.loc, false, value);
+                    this.gl.uniformMatrix2fv(uniform.loc, false, value.m);
                     break;
                 case UniformType.MAT_3:
-                    this.gl.uniformMatrix3fv(uniform.loc, false, value);
+                    this.gl.uniformMatrix3fv(uniform.loc, false, value.m);
                     break;
                 case UniformType.MAT_4:
-                    this.gl.uniformMatrix4fv(uniform.loc, false, value);
+                    this.gl.uniformMatrix4fv(uniform.loc, false, value.m);
                     break;
             }
         }
