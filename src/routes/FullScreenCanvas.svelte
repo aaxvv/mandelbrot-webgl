@@ -4,9 +4,10 @@
 	import { ShaderCanvasContext } from "$lib/shader-canvas-context";
 	import { FractalViewerState } from "$lib/viewer-state.svelte";
     
+    const { viewerState }: { viewerState: FractalViewerState } = $props();
+
     let canvas = $state<HTMLCanvasElement | null>(null);
     let context = $state<ShaderCanvasContext | null>(null);
-    let viewerState = $state<FractalViewerState>(new FractalViewerState());
     
     // create rendering context on canvas mount
     $effect(() => {
@@ -36,11 +37,11 @@
     });
 
     function onResize() {
-        if (canvas != null) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
         viewerState.screenSize = new Vec2(window.innerWidth, window.innerHeight);
+        if (canvas != null) {
+            canvas.width = viewerState.renderSize.x;
+            canvas.height = viewerState.renderSize.y;
+        }
     }
 
     function onScroll(evt: WheelEvent) {
@@ -50,9 +51,9 @@
         const worldPosBefore = viewerState.viewMatrix.mulVec(screenPos);
         
         if (evt.deltaY > 0) {
-            viewerState.zoom *= 1.1;
+            viewerState.zoom *= evt.shiftKey ? 1.25 : 1.1;
         } else {
-            viewerState.zoom *= 0.9;
+            viewerState.zoom *= evt.shiftKey ? 0.75 : 0.9;
         }
         
         const futureViewMatrix = Mat3.makeTransformation(viewerState.center, viewerState.zoom);

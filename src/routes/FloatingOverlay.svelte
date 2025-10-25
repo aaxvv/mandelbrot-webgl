@@ -2,14 +2,14 @@
 	import { CircleQuestionMark } from "@lucide/svelte";
 	import type { Snippet } from "svelte";
 
-    const {children, side}: {children?: Snippet, side: "left" | "right"} = $props();
+    const {children, side, icon}: {children?: Snippet, side: "left" | "right", icon: Snippet} = $props();
 
     let open = $state(false);
 </script>
 
 <div class="container" class:left={side=="left"} class:right={side=="right"}>
     <button onclick={() => {open = !open}}>
-        <CircleQuestionMark color="currentColor" size=24/>
+        {@render icon()}
     </button>
 
     <div class="content" class:hidden={!open}>

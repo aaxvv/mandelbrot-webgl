@@ -1,6 +1,8 @@
 import type { Mat3, Vec2 } from "./math";
 import { ShaderProgram, UniformType } from "./shader-canvas-context";
 
+export const MAX_ITERATIONS = 10000;
+
 const VERTEX_SHADER = `
     precision highp float;
 
@@ -19,17 +21,18 @@ const VERTEX_SHADER = `
 const FRAGMENT_SHADER = `
     precision highp float;
     
-    const int MAX_ITERATIONS = 10000;
+    const int MAX_ITERATIONS = ${MAX_ITERATIONS};
     const float ESCAPE_RADIUS_SQR = 4.0;
     
     uniform int uIterations;
+    uniform vec2 uInitialZ;
     uniform mat3 uViewMat;
 
     varying vec2 vPos;
 
     void main() {
 
-        vec2 z = vec2(0.0, 0.0);
+        vec2 z = uInitialZ;
         vec3 vPosTransformed = uViewMat * vec3(vPos, 1.0);
         vec2 c = vec2(vPosTransformed.x, vPosTransformed.y);
 
@@ -63,12 +66,14 @@ const FRAGMENT_SHADER = `
 export interface MandelbrotUniforms {
     uScreenSize: Vec2,
     uIterations: number,
+    uInitialZ: Vec2,
     uViewMat: Mat3,
 }
 
 const UNIFORMS: {[K in keyof(MandelbrotUniforms)]: UniformType} = {
     uScreenSize: UniformType.VEC_2,
     uIterations: UniformType.INT,
+    uInitialZ: UniformType.VEC_2,
     uViewMat: UniformType.MAT_3,
 };
 
